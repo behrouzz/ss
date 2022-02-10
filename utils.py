@@ -1,6 +1,7 @@
 from numpy import pi, sin, cos, tan, sqrt, arctan2, arcsin, arctan, arccos, log10
 
 rd = pi/180
+dg = 180/pi
 
 def day(y, m, D, UT):
     d = 367*y - 7 * ( y + (m+9)//12 ) // 4 + 275*m//9 + D - 730530
