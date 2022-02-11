@@ -2,6 +2,9 @@ import numpy as np
 from numpy import sin, cos, sqrt, arctan2
 from utils import rev, obl_ecl, getE, rd, dg
 
+def mag(x):
+    return np.linalg.norm(np.array(x))
+
 def cartesian_to_spherical(x, y ,z):
     lon = rev(np.arctan2(y, x)*dg)
     lat = np.arctan2(z, np.sqrt(x**2 + y**2))*dg
