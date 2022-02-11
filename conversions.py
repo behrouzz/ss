@@ -39,3 +39,55 @@ def elements_to_ecliptic(name, N,i,w,a,e,M):
         z_ecl = r * ( sin((v+w)*rd) * sin(i*rd) )
         return x_ecl, y_ecl, z_ecl
 
+def state_to_element(r, v, mu=1.32712440018e+20):
+    """
+    N (rad) : longitude of the ascending node
+    i (rad) : inclination to the ecliptic
+    w (rad) : argument of perihelion
+    a (m)   : semi-major axis, or mean distance from Sun
+    e       : eccentricity (0=circle, 0-1=ellipse, 1=parabola)
+    M (rad) : mean anomaly
+    """
+    h = np.cross(r, v)
+
+    # eccentricity vector
+    ev = (np.cross(v,h)/mu) - (r/mag(r))
+    e = mag(ev) # orbit eccentricity
+
+    # vector pointing towards the ascending node
+    n = np.cross(np.array([0,0,1]), h)
+
+    # true anomaly (in radian)
+    tmp = np.inner(ev,r)/(e*mag(r))
+
+    if np.inner(r,v) >= 0:
+        vv = np.arccos(tmp)
+    else:
+        vv = 2*np.pi - np.arccos(tmp)
+
+    # inclination (in radian)
+    i = np.arccos(h[-1]/mag(h))
+
+    # eccentric anomaly
+    E = 2 * np.arctan(np.tan(vv/2)/np.sqrt((1+e)/(1-e)))
+
+    # longitude of the ascending node (in radian)
+    if n[1] >= 0:
+        N = np.arccos(n[0]/mag(n))
+    else:
+        N = 2*pi - np.arccos(n[0]/mag(n))
+
+    # argument of perihelion
+    tmp = np.inner(n, ev) / (mag(n)*e)
+    if ev[-1] >= 0:
+        w = np.arccos(tmp)
+    else:
+        w = 2*np.pi - np.arccos(tmp)
+
+    # mean anomaly
+    M = E - e*np.sin(E)
+
+    # semi-major axis
+    a = 1 / ((2/mag(r)) - (mag(v)**2 / mu))
+
+    return N,i,w,a,e,M

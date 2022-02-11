@@ -325,5 +325,5 @@ class planet:
 #d = day(1990, 4, 19, 0)
 d = day(2022, 2, 11, 10)
 
-m = moon(d, (7, 48))
+p = planet('venus', d)
 
