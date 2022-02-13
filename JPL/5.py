@@ -30,7 +30,7 @@ df['time'] = pd.to_datetime(df['time'])
 df.set_index('time', inplace=True)
 
 x = df['day'].values
-y = df['i'].values
+y = df['N'].values
 
 # polynomial
 my_coefs = np.polyfit(x, y, 5)
