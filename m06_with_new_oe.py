@@ -1,8 +1,9 @@
 from numpy import pi, sin, cos, tan, sqrt, arctan2, arcsin, arctan, arccos, log10
-from orbital_elements import *
+#from orbital_elements import *
+from new_oe import elements
 from utils import *
 from conversions import cartesian_to_spherical, spherical_to_cartesian, ecliptic_to_equatorial, elements_to_ecliptic
-from corrections import moon_perts, jupiter_lon_perts, saturn_lon_perts, saturn_lat_perts, uranus_lon_perts
+#from corrections import moon_perts, jupiter_lon_perts, saturn_lon_perts, saturn_lat_perts, uranus_lon_perts
 
 class sun:
     """
@@ -13,7 +14,8 @@ class sun:
         self.name = 'sun'
         ecl = obl_ecl(d)
         self.d = d
-        self.N, self.i, self.w, self.a, self.e, self.M = sun_oe(d)
+        #self.N, self.i, self.w, self.a, self.e, self.M = sun_oe(d)
+        self.N, self.i, self.w, self.a, self.e, self.M = elements(self.name, self.d)
         self.L = rev(self.w + self.M)
         self.x_ecl, self.y_ecl, self.z_ecl, self.lon = elements_to_ecliptic('sun', self.N, self.i, self.w, self.a, self.e, self.M)
         self.x_equ, self.y_equ, self.z_equ = ecliptic_to_equatorial(self.x_ecl, self.y_ecl, self.z_ecl, d)
@@ -201,9 +203,12 @@ class planet:
     """
     def __init__(self, name, d, obs_loc=None, epoch=None):
         self.name = name.lower()
+        self.d = d
         #self.obs_loc = obs_loc
         ecl = obl_ecl(d)
         self._sun = sun(d)
+
+        """
         
         if self.name=='mercury':
             N,i,w,a,e,M = mercury_oe(d)
@@ -222,9 +227,11 @@ class planet:
         else:
             raise Exception('Planet name not valid!')
 
-        #self.N, self.i, self.w, self.a, self.e, self.M = N,i,w,a,e,M
+        """
 
-        #self.E = getE(e, M, dp=5)
+        
+        N,i,w,a,e,M = elements(self.name, self.d) # new
+        
         E = getE(e, M, dp=5)
         
         xv = a * (cos(E*rd) - e)
@@ -241,6 +248,7 @@ class planet:
         # spherical heliocentric ecliptic
         self.lon_h_ecl, self.lat_h_ecl, self.r_h_ecl = \
                         cartesian_to_spherical(xh_ecl, yh_ecl, zh_ecl)
+        """
 
         # Correcting perturbations of Jupiter, Saturn and Uranus
         if self.name in ['jupiter', 'saturn', 'uranus']:
@@ -254,14 +262,18 @@ class planet:
                 self.lat_h_ecl = self.lat_h_ecl + saturn_lat_perts(Mj, Ms, Mu)
             elif self.name=='uranus':
                 self.lon_h_ecl = self.lon_h_ecl + uranus_lon_perts(Mj, Ms, Mu)
+        """
                 
         # Precession
         if epoch is not None:
             self.lon_h_ecl = self.lon_h_ecl + 3.82394E-5 * (365.2422 * (epoch-2000) - d)
 
+        """
         # kh: hypatie
         self.xh_ecl, self.yh_ecl, self.zh_ecl = \
                      spherical_to_cartesian(self.lon_h_ecl, self.lat_h_ecl, self.r_h_ecl)
+        """
+        self.xh_ecl, self.yh_ecl, self.zh_ecl = xh_ecl, yh_ecl, zh_ecl # new 
 
         self.xg_ecl = self._sun.x_ecl + self.xh_ecl
         self.yg_ecl = self._sun.y_ecl + self.yh_ecl
@@ -328,7 +340,14 @@ d = day(2022, 2, 11, 10)
 s = sun(d)
 p = planet('venus', d)#, epoch=2000)
 
-print('m05.py')
+print('m06_with_new_oe.py')
 print(s.name, ':', (s.ra, s.dec))
 print(p.name, ':', (p.ra, p.dec))
 print(p.r)
+
+"""
+Nemidoonam chera deghatesh kamtar az male oon aghahast ke ba
+linear regression anjam dade bood.
+In file ro negah midaram ta badan roosh kar konam. Vali felan
+male hamoon aghahe ro edame midam.
+"""

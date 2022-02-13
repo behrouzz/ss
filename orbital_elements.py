@@ -1,13 +1,27 @@
 # http://stjarnhimlen.se/comp/ppcomp.html
+from utils import rev
 
-def rev(x):
-    if x >= 360:
-        while x >= 360:
-            x = x - 360
-    elif x < 0:
-        while x < 0:
-            x = 360 + x
-    return x
+def elements(name, d):
+    if name=='sun':
+        N,i,w,a,e,M = sun_oe(d)
+    elif name=='moon':
+        N,i,w,a,e,M = moon_oe(d)
+    elif name=='mercury':
+        N,i,w,a,e,M = mercury_oe(d)
+    elif name=='venus':
+        N,i,w,a,e,M = venus_oe(d)
+    elif name=='mars':
+        N,i,w,a,e,M = mars_oe(d)
+    elif name=='jupiter':
+        N,i,w,a,e,M = jupiter_oe(d)
+    elif name=='saturn':
+        N,i,w,a,e,M = saturn_oe(d)
+    elif name=='uranus':
+        N,i,w,a,e,M = uranus_oe(d)
+    elif name=='neptune':
+        N,i,w,a,e,M = neptune_oe(d)
+    return N,i,w,a,e,M
+    
 
 def sun_oe(d):
     N = 0.0
@@ -25,7 +39,7 @@ def moon_oe(d):
     a = 60.2666 # (Earth radii)
     e = 0.054900
     M = 115.3654 + 13.0649929509 * d
-    return N,i,w,a,e,M
+    return rev(N),i,rev(w),a,e,rev(M)
 
 def mercury_oe(d):
     N =  48.3313 + 3.24587E-5 * d

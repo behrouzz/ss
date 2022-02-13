@@ -1,29 +1,8 @@
 from numpy import pi, sin, cos, tan, sqrt, arctan2, arcsin, arctan, arccos, log10
-#from orbital_elements import *
+from orbital_elements import elements
 from utils import *
 from conversions import cartesian_to_spherical, spherical_to_cartesian, ecliptic_to_equatorial, elements_to_ecliptic
 from corrections import moon_perts, jupiter_lon_perts, saturn_lon_perts, saturn_lat_perts, uranus_lon_perts
-
-
-import numpy as np
-
-sun_oe = {
-    'N' : (20.552775873722602, 0.2136832880120676, -3.580978347278808, 174.97389301955806),
-    'i' : (0.001101954782290859, 0.21369711394557486, -5.275796592097575, 0.00015489408592731231, 3.621325113811721e-07),
-    'w' : (-20.630936449162093, 0.21368386463476155, -3.5858347681354386, 288.0401174521317),
-    'a' : (0.0008991876561645148, 0.21276978132643024, 6.440250190274306, 1.000002237215457),
-    'e' : (0.000624492722824836, 0.2299825556661901, 6.272769979941623, 0.01670036421395417),
-    'M' : [ 9.85645883e-01, -6.84436431e+03]
-    }
-
-mercury_oe = {
-    'N' : [2.5943137649076465e-33, -1.6458405468796637e-28, 4.1886116153189024e-24, -4.986022118098174e-20, 1.425664896833767e-16, 3.579902179195779e-12, -5.08222878798609e-08, 0.0003084130928174047, -0.9418197727279626, 1229.9985299396456],
-    'i' : [-5.377291695654706e-36, 4.985297704367898e-31, -1.7171150986776112e-26, 2.7243783637920533e-22, -1.432580698949224e-18, -1.7317540599834052e-14, 3.4635949171992256e-10, -2.5036145236034457e-06, 0.00875602156565588, -5.3234684354500335],
-    'w' : [7.266185018994313e-06, 29.130043647166488],
-    'a' : (-7.302881780107657e-07, 0.015618668472226156, -0.16626523478656402, 0.3870983517945791),
-    'e' : [-9.795222209711759e-79, 4.948344530013818e-74, -7.165646271347012e-70, -1.1487378401636948e-66, 6.912912897843176e-62, 4.067964777551289e-58, -5.014514038358126e-54, -8.163511441235564e-50, -8.754412696402857e-47, 8.607607039568674e-42, 8.339252306647572e-38, -3.0418308726218236e-34, -1.2193128129962863e-29, -5.338302719089814e-26, 1.1024320681178665e-21, 1.1731761292564323e-17, -9.765034347403027e-14, -1.4031494864886622e-09, 1.9017897264846455e-05, -0.08182346678242457, 125.15061900135669],
-    'M' : [ 4.09233458e+00, -2.97113448e+04]
-    }
 
 class sun:
     """
@@ -34,23 +13,7 @@ class sun:
         self.name = 'sun'
         ecl = obl_ecl(d)
         self.d = d
-        #self.N, self.i, self.w, self.a, self.e, self.M = sun_oe(d)
-
-        A, w, p, c = sun_oe['N'] ; f_N = lambda t: A * np.sin(w*t + p) + c
-        A, w, p, c, m = sun_oe['i'] ; f_i = lambda t: A * np.sin(w*t + p) + c + m*t
-        A, w, p, c = sun_oe['w'] ; f_w = lambda t: A * np.sin(w*t + p) + c
-        A, w, p, c = sun_oe['a'] ; f_a = lambda t: A * np.sin(w*t + p) + c
-        A, w, p, c = sun_oe['e'] ; f_e = lambda t: A * np.sin(w*t + p) + c
-        f_M = np.poly1d(sun_oe['M'])
-
-        self.N = f_N(d)
-        self.i = f_i(d)
-        self.w = f_w(d)
-        self.a = f_a(d)
-        self.e = f_e(d)
-        self.M = rev(f_M(d))
-
-        
+        self.N, self.i, self.w, self.a, self.e, self.M = elements(self.name, d)
         self.L = rev(self.w + self.M)
         self.x_ecl, self.y_ecl, self.z_ecl, self.lon = elements_to_ecliptic('sun', self.N, self.i, self.w, self.a, self.e, self.M)
         self.x_equ, self.y_equ, self.z_equ = ecliptic_to_equatorial(self.x_ecl, self.y_ecl, self.z_ecl, d)
@@ -125,10 +88,7 @@ class moon:
         ecl = obl_ecl(d)
         #self.obs_loc = obs_loc
         self._sun = sun(d)
-        
-        N, self.i, w, self.a, self.e, M = moon_oe(d)
-        self.N, self.w, self.M = rev(N), rev(w), rev(M)
-        
+        self.N, self.i, self.w, self.a, self.e, self.M = elements(self.name, d)
         x_ecl, y_ecl, z_ecl = elements_to_ecliptic('moon', self.N, self.i, self.w, self.a, self.e, self.M)
         ecl_lon, ecl_lat, ecl_r = cartesian_to_spherical(x_ecl, y_ecl, z_ecl)
 
@@ -241,39 +201,9 @@ class planet:
         #self.obs_loc = obs_loc
         ecl = obl_ecl(d)
         self._sun = sun(d)
+        N,i,w,a,e,M = elements(self.name, d)
         
-        if self.name=='mercury':
-            N,i,w,a,e,M = mercury_oe(d)
-        elif self.name=='venus':
-            N,i,w,a,e,M = venus_oe(d)
-        elif self.name=='mars':
-            N,i,w,a,e,M = mars_oe(d)
-        elif self.name=='jupiter':
-            N,i,w,a,e,M = jupiter_oe(d)
-        elif self.name=='saturn':
-            N,i,w,a,e,M = saturn_oe(d)
-        elif self.name=='uranus':
-            N,i,w,a,e,M = uranus_oe(d)
-        elif self.name=='neptune':
-            N,i,w,a,e,M = neptune_oe(d)
-        else:
-            raise Exception('Planet name not valid!')
-
-        #self.N, self.i, self.w, self.a, self.e, self.M = N,i,w,a,e,M
-
-        #self.E = getE(e, M, dp=5)
-        E = getE(e, M, dp=5)
-        
-        xv = a * (cos(E*rd) - e)
-        yv = a * (sqrt(1 - e**2) * sin(E*rd))
-
-        r = sqrt(xv**2 + yv**2) # in AU
-        v = rev(arctan2(yv, xv) *(180/pi)) # true anomaly
-
-        # rectangular heliocentric ecliptic
-        xh_ecl = r * ( cos(N*rd) * cos((v+w)*rd) - sin(N*rd) * sin((v+w)*rd) * cos(i*rd) )
-        yh_ecl = r * ( sin(N*rd) * cos((v+w)*rd) + cos(N*rd) * sin((v+w)*rd) * cos(i*rd) )
-        zh_ecl = r * ( sin((v+w)*rd) * sin(i*rd) )
+        xh_ecl, yh_ecl, zh_ecl = elements_to_ecliptic(self.name, N,i,w,a,e,M)
 
         # spherical heliocentric ecliptic
         self.lon_h_ecl, self.lat_h_ecl, self.r_h_ecl = \
@@ -363,9 +293,9 @@ class planet:
 d = day(2022, 2, 11, 10)
 
 s = sun(d)
+p = planet('venus', d)#, epoch=2000)
 
-from astropy.coordinates import get_sun
-from astropy.time import Time
-
-t = Time('2022-02-11 10:00:00')
-c = get_sun(t)
+print('m07.py')
+print(s.name, ':', (s.ra, s.dec))
+print(p.name, ':', (p.ra, p.dec))
+print(p.r)
