@@ -33,7 +33,7 @@ x = df['day'].values
 y = df['i'].values
 
 # polynomial
-my_coefs = np.polyfit(x, y, 9)
+my_coefs = np.polyfit(x, y, 5)
 my_func = np.poly1d(my_coefs)
 print(planets[i])
 print(str(list(my_coefs)))
@@ -42,14 +42,8 @@ print(str(list(my_coefs)))
 A, w, p, c = fit_sin(x, y)
 sin_func = lambda t: A * np.sin(w*t + p) + c
 
-# mean
-y_pred = (my_func(x) + sin_func(x))/2
-
 fig, ax = plt.subplots()
 ax.plot(x, y)
 ax.plot(x, my_func(x), c='y', alpha=0.5)
 ax.plot(x, sin_func(x), c='r', alpha=0.5)
-ax.plot(x, y_pred, c='g', alpha=0.5)
 plt.show()
-
-
