@@ -35,6 +35,9 @@ def obl_ecl(d):
     ecl = 23.4393 - 3.563E-7 * d
     return ecl
 
+def obl_ecl(d):
+    # My own fit with JPL's JDTDB
+    ecl = 24.312212901355764 - 3.5606446971883423e-07 * d
 
 def getE(ec, m, dp=5):
     # http://www.jgiesen.de/kepler/kepler.html
