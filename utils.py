@@ -37,7 +37,9 @@ def obl_ecl(d):
 
 def obl_ecl_kh(d):
     # My own fit with JPL's JDTDB
-    ecl = 24.312212901355764 - 3.5606446971883423e-07 * d
+    #ecl = 24.312212901355764 - 3.5606446971883423e-07 * d
+    incl = 24.312603556024428 - 3.5623324732981026e-07 * d
+    return incl
 
 def getE(ec, m, dp=5):
     # http://www.jgiesen.de/kepler/kepler.html
