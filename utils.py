@@ -15,6 +15,9 @@ def getUT(d):
         UT = (d - int(d)) * 24
     return UT
 
+def getUT_kh(d):
+    return (d - int(d)) * 24
+
 def floor(x):
     if x<0:
         return int(x)-1
