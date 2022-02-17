@@ -6,10 +6,9 @@ df = pd.read_csv('data/earth.csv')
 cf = pd.read_csv('data/coefs.csv')
 
 x = df['JDTDB'].values
-y = df['OM'].values
+y = df['IN'].values
 
-
-OMcf = cf['OM'].values
+OMcf = cf['IN'].values
 OMdm = np.array([2458849.5, 2462502.5])
 
 f = np.polynomial.chebyshev.Chebyshev(coef=OMcf, domain=OMdm)

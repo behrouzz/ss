@@ -9,7 +9,7 @@ x = df['JDTDB'].values
 dc = {}
 for col in ['OM', 'IN', 'W', 'A', 'EC']:
     y = df[col].values
-    f = np.polynomial.Chebyshev.fit(x, y, deg=500)
+    f = np.polynomial.Chebyshev.fit(x, y, deg=1000)
     print(col)
     print('Domain:', f.domain)
     print('Window:', f.window)
